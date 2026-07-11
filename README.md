@@ -247,6 +247,12 @@ packages/
 
 ---
 
+## 📄 许可证
+
+本项目采用 **MIT License** — 详见 [LICENSE](LICENSE) 文件。
+
+---
+
 <div align="center">
   <sub>Built with ❤️ by AL086</sub>
 </div>
