@@ -1,0 +1,68 @@
+---
+- name: SwiftDeploy Infrastructure Setup
+  hosts: all
+  become: yes
+  vars:
+    dns_server: "8.8.8.8"
+    dhcp_range: "192.168.1.100,192.168.1.200"
+    pxe_server: "{{ ansible_default_ipv4.address }}"
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - dnsmasq
+          - nginx
+          - python3
+          - python3-pip
+          - qemu-kvm
+          - libvirt-daemon-system
+        state: present
+        update_cache: yes
+
+    - name: Configure dnsmasq
+      template:
+        src: dnsmasq.conf.j2
+        dest: /etc/dnsmasq.conf
+      notify: restart dnsmasq
+
+    - name: Configure nginx for PXE
+      template:
+        src: nginx-pxe.conf.j2
+        dest: /etc/nginx/sites-available/pxe
+      notify: restart nginx
+
+    - name: Enable nginx PXE site
+      file:
+        src: /etc/nginx/sites-available/pxe
+        dest: /etc/nginx/sites-enabled/pxe
+        state: link
+      notify: restart nginx
+
+    - name: Create PXE directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /srv/pxe/boot
+        - /srv/pxe/iso
+        - /srv/tftp
+
+    - name: Install Python packages
+      pip:
+        name:
+          - ansible
+          - netaddr
+        state: present
+
+  handlers:
+    - name: restart dnsmasq
+      service:
+        name: dnsmasq
+        state: restarted
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted

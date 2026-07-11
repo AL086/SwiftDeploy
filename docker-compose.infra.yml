@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  dnsmasq:
+    image: jpillora/dnsmasq:latest
+    ports:
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8080:8080"
+    environment:
+      - DHCP_RANGE=${DNSMASQ_DHCP_RANGE:-192.168.1.100,192.168.1.200,24h}
+      - DNS_SERVER=8.8.8.8
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+
+  nginx-pxe:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "69:69/udp"
+    volumes:
+      - ./infra/pxe:/usr/share/nginx/html/pxe
+    restart: unless-stopped
+
+  ansible:
+    image: alpine:latest
+    command: tail -f /dev/null
+    volumes:
+      - ./infra/ansible:/ansible
+    restart: unless-stopped

@@ -1,0 +1,33 @@
+# SwiftDeploy PXE Nginx Configuration
+server {
+    listen 80;
+    server_name {{ pxe_server }};
+    root /srv/pxe;
+
+    # PXE boot files
+    location /pxe/ {
+        alias /srv/pxe/boot/;
+        autoindex on;
+        autoindex_exact_size off;
+        autoindex_localtime on;
+    }
+
+    # ISO images
+    location /iso/ {
+        alias /srv/pxe/iso/;
+        autoindex on;
+    }
+
+    # iPXE scripts
+    location /ipxe/ {
+        alias /srv/pxe/ipxe/;
+        autoindex on;
+        add_header Content-Type text/plain;
+    }
+
+    # Ansible config
+    location /ansible/ {
+        alias /srv/ansible/;
+        autoindex on;
+    }
+}

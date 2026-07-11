@@ -1,0 +1,306 @@
+syntax = "proto3";
+
+package swiftdeploy;
+
+service SwiftDeploy {
+  // Health
+  rpc Health (HealthRequest) returns (HealthResponse);
+
+  // Hosts
+  rpc ListHosts (ListHostsRequest) returns (ListHostsResponse);
+  rpc GetHost (GetHostRequest) returns (Host);
+  rpc CreateHost (CreateHostRequest) returns (Host);
+  rpc UpdateHost (UpdateHostRequest) returns (Host);
+  rpc DeleteHost (DeleteHostRequest) returns (Empty);
+
+  // Blueprints
+  rpc ListBlueprints (ListBlueprintsRequest) returns (ListBlueprintsResponse);
+  rpc GetBlueprint (GetBlueprintRequest) returns (Blueprint);
+  rpc CreateBlueprint (CreateBlueprintRequest) returns (Blueprint);
+  rpc UpdateBlueprint (UpdateBlueprintRequest) returns (Blueprint);
+  rpc DeleteBlueprint (DeleteBlueprintRequest) returns (Empty);
+
+  // Install
+  rpc ListInstallTasks (ListInstallTasksRequest) returns (ListInstallTasksResponse);
+  rpc CreateInstallTask (CreateInstallTaskRequest) returns (InstallTask);
+  rpc UpdateInstallTask (UpdateInstallTaskRequest) returns (InstallTask);
+  rpc DeleteInstallTask (DeleteInstallTaskRequest) returns (Empty);
+  rpc ListImages (Empty) returns (ListImagesResponse);
+
+  // Service
+  rpc ListTemplates (ListTemplatesRequest) returns (ListTemplatesResponse);
+  rpc CreateTemplate (CreateTemplateRequest) returns (RoleTemplate);
+  rpc ListDeployments (ListDeploymentsRequest) returns (ListDeploymentsResponse);
+  rpc CreateDeployment (CreateDeploymentRequest) returns (ServiceDeployment);
+
+  // Monitor
+  rpc PushMonitoringData (MonitoringData) returns (Empty);
+  rpc GetMonitoringData (GetMonitoringDataRequest) returns (MonitoringDataList);
+  rpc ListAlertRules (ListAlertRulesRequest) returns (ListAlertRulesResponse);
+  rpc CreateAlertRule (CreateAlertRuleRequest) returns (AlertRule);
+  rpc UpdateAlertRule (UpdateAlertRuleRequest) returns (AlertRule);
+  rpc DeleteAlertRule (DeleteAlertRuleRequest) returns (Empty);
+  rpc ListAlertLogs (ListAlertLogsRequest) returns (ListAlertLogsResponse);
+
+  // Auth
+  rpc Login (LoginRequest) returns (LoginResponse);
+}
+
+// ── Common ────────────────────────────────────────────────
+message Empty {}
+
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total = 3;
+}
+
+// ── Health ────────────────────────────────────────────────
+message HealthRequest {}
+message HealthResponse {
+  string status = 1;
+  string version = 2;
+  string database = 3;
+}
+
+// ── Host ──────────────────────────────────────────────────
+message Host {
+  string mac = 1;
+  string hostname = 2;
+  string ip = 3;
+  string os = 4;
+  string status = 5;
+  string group_name = 6;
+}
+
+message ListHostsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string status = 3;
+  string search = 4;
+}
+
+message ListHostsResponse {
+  repeated Host items = 1;
+  Pagination pagination = 2;
+}
+
+message GetHostRequest { string mac = 1; }
+message CreateHostRequest { Host host = 1; }
+message UpdateHostRequest {
+  string mac = 1;
+  Host host = 2;
+}
+message DeleteHostRequest { string mac = 1; }
+
+// ── Blueprint ─────────────────────────────────────────────
+message Blueprint {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 version = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message BlueprintNode {
+  int32 id = 1;
+  int32 blueprint_id = 2;
+  string type = 3;
+  string label = 4;
+  string mac = 5;
+  string ip = 6;
+  double pos_x = 7;
+  double pos_y = 8;
+}
+
+message Connection {
+  int32 id = 1;
+  int32 blueprint_id = 2;
+  int32 from_node_id = 3;
+  int32 to_node_id = 4;
+  string from_port = 5;
+  string to_port = 6;
+}
+
+message ListBlueprintsRequest { int32 page = 1; int32 page_size = 2; }
+message ListBlueprintsResponse {
+  repeated Blueprint items = 1;
+  Pagination pagination = 2;
+}
+message GetBlueprintRequest { int32 id = 1; }
+message CreateBlueprintRequest {
+  string name = 1;
+  string description = 2;
+}
+message UpdateBlueprintRequest {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+}
+message DeleteBlueprintRequest { int32 id = 1; }
+
+// ── Install ───────────────────────────────────────────────
+message InstallTask {
+  int32 id = 1;
+  string name = 2;
+  string status = 3;
+  string type = 4;
+  string created_at = 5;
+}
+
+message Image {
+  int32 id = 1;
+  string name = 2;
+  string distro = 3;
+  string version = 4;
+  string path = 5;
+}
+
+message ListInstallTasksRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string status = 3;
+}
+message ListInstallTasksResponse {
+  repeated InstallTask items = 1;
+  Pagination pagination = 2;
+}
+message CreateInstallTaskRequest {
+  string name = 1;
+  string type = 2;
+  int32 blueprint_id = 3;
+}
+message UpdateInstallTaskRequest {
+  int32 id = 1;
+  string status = 2;
+}
+message DeleteInstallTaskRequest { int32 id = 1; }
+message ListImagesResponse {
+  repeated Image items = 1;
+}
+
+// ── Service ───────────────────────────────────────────────
+message RoleTemplate {
+  int32 id = 1;
+  string name = 2;
+  string category = 3;
+  string description = 4;
+  bool built_in = 5;
+}
+
+message ServiceDeployment {
+  int32 id = 1;
+  string host_id = 2;
+  int32 role_id = 3;
+  string status = 4;
+  string deployed_at = 5;
+}
+
+message ListTemplatesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string category = 3;
+}
+message ListTemplatesResponse {
+  repeated RoleTemplate items = 1;
+  Pagination pagination = 2;
+}
+message CreateTemplateRequest {
+  string name = 1;
+  string category = 2;
+  string description = 3;
+}
+message ListDeploymentsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string status = 3;
+}
+message ListDeploymentsResponse {
+  repeated ServiceDeployment items = 1;
+  Pagination pagination = 2;
+}
+message CreateDeploymentRequest {
+  string host_id = 1;
+  int32 role_id = 2;
+}
+
+// ── Monitor ───────────────────────────────────────────────
+message MonitoringData {
+  string host_id = 1;
+  double cpu_percent = 2;
+  double mem_percent = 3;
+  double disk_percent = 4;
+  double load_1m = 5;
+}
+
+message MonitoringDataList {
+  repeated MonitoringData items = 1;
+}
+
+message GetMonitoringDataRequest {
+  string host_id = 1;
+  int32 limit = 2;
+}
+
+message AlertRule {
+  int32 id = 1;
+  string name = 2;
+  string metric = 3;
+  string condition = 4;
+  double threshold = 5;
+  int32 duration_sec = 6;
+  string severity = 7;
+  bool enabled = 8;
+}
+
+message AlertLog {
+  int32 id = 1;
+  int32 rule_id = 2;
+  string host_id = 3;
+  string triggered_at = 4;
+  double value = 5;
+  bool notified = 6;
+}
+
+message ListAlertRulesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string severity = 3;
+}
+message ListAlertRulesResponse {
+  repeated AlertRule items = 1;
+  Pagination pagination = 2;
+}
+message CreateAlertRuleRequest {
+  string name = 1;
+  string metric = 2;
+  string condition = 3;
+  double threshold = 4;
+  string severity = 5;
+}
+message UpdateAlertRuleRequest {
+  int32 id = 1;
+  AlertRule rule = 2;
+}
+message DeleteAlertRuleRequest { int32 id = 1; }
+message ListAlertLogsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 rule_id = 3;
+  string host_id = 4;
+}
+message ListAlertLogsResponse {
+  repeated AlertLog items = 1;
+  Pagination pagination = 2;
+}
+
+// ── Auth ──────────────────────────────────────────────────
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+message LoginResponse {
+  string access_token = 1;
+  string token_type = 2;
+}

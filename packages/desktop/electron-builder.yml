@@ -1,0 +1,50 @@
+appId: com.swiftdeploy.app
+productName: "轻舟 SwiftDeploy"
+copyright: "Copyright © 2024 SwiftDeploy"
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - dist/**/*
+  - resources/**/*
+  - proto/**/*
+
+extraResources:
+  - from: ../../infra
+    to: infra
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon.png
+  artifactName: "${productName}-${version}-Setup.${ext}"
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  language: "2052"
+  uninstallDisplayName: "轻舟 SwiftDeploy ${version}"
+  shortcutName: "轻舟 SwiftDeploy"
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico
+
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Utility
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.utilities

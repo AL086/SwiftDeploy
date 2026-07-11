@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./packages/server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "50051:50051"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=3000
+      - DATABASE_URL=sqlite:///app/data/swiftdeploy.db
+      - JWT_SECRET=dev-secret
+      - LOG_LEVEL=debug
+      - GRPC_PORT=50051
+    volumes:
+      - server_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  server_data:
