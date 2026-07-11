@@ -247,12 +247,6 @@ packages/
 
 ---
 
-## 📄 许可证
-
-MIT
-
----
-
 <div align="center">
   <sub>Built with ❤️ by AL086</sub>
 </div>
