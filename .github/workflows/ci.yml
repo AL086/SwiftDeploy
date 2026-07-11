@@ -94,4 +94,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build -t swiftdeploy-server ./packages/server
+        run: docker build -t swiftdeploy-server -f packages/server/Dockerfile .
